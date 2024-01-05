@@ -16,10 +16,11 @@ import net.minecraftforge.fml.common.IWorldGenerator;
 
 import java.util.Random;
 
-public class LegacyWorldGen implements IWorldGenerator {
-
+public class LegacyWorldGen implements IWorldGenerator
+{
     @Override
-    public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+    public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider)
+    {
         if (world.provider.getDimension() != 0) {
             return;
         }
@@ -56,5 +57,4 @@ public class LegacyWorldGen implements IWorldGenerator {
             }
         }
     }
-
 }

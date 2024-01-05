@@ -15,8 +15,8 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class TileWaystone extends TileEntity {
-
+public class TileWaystone extends TileEntity
+{
     private boolean isDummy;
     private String waystoneName = "";
     private UUID owner;
@@ -24,139 +24,161 @@ public class TileWaystone extends TileEntity {
     private boolean wasGenerated = true;
     private boolean isMossy;
 
-    public TileWaystone() {
+    public TileWaystone()
+    {
     }
 
-    public TileWaystone(boolean isDummy) {
+    public TileWaystone(boolean isDummy)
+    {
         this.isDummy = isDummy;
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound)
+    {
         super.writeToNBT(tagCompound);
-        tagCompound.setBoolean("IsDummy", isDummy);
-        if (!isDummy) {
-            if (!waystoneName.equals("%RANDOM%")) {
-                tagCompound.setString("WaystoneName", waystoneName);
-                tagCompound.setBoolean("WasGenerated", wasGenerated);
+        tagCompound.setBoolean("IsDummy", this.isDummy);
+        if (!this.isDummy) {
+            if (!this.waystoneName.equals("%RANDOM%")) {
+                tagCompound.setString("WaystoneName", this.waystoneName);
+                tagCompound.setBoolean("WasGenerated", this.wasGenerated);
             } else {
                 tagCompound.setBoolean("WasGenerated", true);
             }
 
-            if (owner != null) {
-                tagCompound.setTag("Owner", NBTUtil.createUUIDTag(owner));
+            if (this.owner != null) {
+                tagCompound.setTag("Owner", NBTUtil.createUUIDTag(this.owner));
             }
 
-            tagCompound.setBoolean("IsGlobal", isGlobal);
-            tagCompound.setBoolean("IsMossy", isMossy);
+            tagCompound.setBoolean("IsGlobal", this.isGlobal);
+            tagCompound.setBoolean("IsMossy", this.isMossy);
         }
         return tagCompound;
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound tagCompound) {
+    public void readFromNBT(NBTTagCompound tagCompound)
+    {
         super.readFromNBT(tagCompound);
-        isDummy = tagCompound.getBoolean("IsDummy");
-        if (!isDummy) {
-            waystoneName = tagCompound.getString("WaystoneName");
-            wasGenerated = tagCompound.getBoolean("WasGenerated");
+        this.isDummy = tagCompound.getBoolean("IsDummy");
+        if (!this.isDummy) {
+            this.waystoneName = tagCompound.getString("WaystoneName");
+            this.wasGenerated = tagCompound.getBoolean("WasGenerated");
             if (tagCompound.hasKey("Owner")) {
-                owner = NBTUtil.getUUIDFromTag(tagCompound.getCompoundTag("Owner"));
+                this.owner = NBTUtil.getUUIDFromTag(tagCompound.getCompoundTag("Owner"));
             }
 
-            isGlobal = tagCompound.getBoolean("IsGlobal");
+            this.isGlobal = tagCompound.getBoolean("IsGlobal");
 
-            isMossy = tagCompound.getBoolean("IsMossy");
+            this.isMossy = tagCompound.getBoolean("IsMossy");
         }
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
+    {
         super.onDataPacket(net, pkt);
-        generateNameIfNecessary();
-        readFromNBT(pkt.getNbtCompound());
+        this.generateNameIfNecessary();
+        this.readFromNBT(pkt.getNbtCompound());
     }
 
     @Override
-    public NBTTagCompound getUpdateTag() {
-        generateNameIfNecessary();
-        return writeToNBT(new NBTTagCompound());
+    public NBTTagCompound getUpdateTag()
+    {
+        this.generateNameIfNecessary();
+        return this.writeToNBT(new NBTTagCompound());
     }
 
-    private void generateNameIfNecessary() {
-        if (waystoneName.isEmpty()) {
-            waystoneName = NameGenerator.get(world).getName(pos, world.provider.getDimension(), world.getBiome(pos), world.rand);
+    private void generateNameIfNecessary()
+    {
+        if (this.waystoneName.isEmpty()) {
+            this.waystoneName = NameGenerator.get(this.world).getName(this.pos, this.world.provider.getDimension(), this.world.getBiome(this.pos), this.world.rand);
         }
     }
 
     @Nullable
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
+    public SPacketUpdateTileEntity getUpdatePacket()
+    {
+        return new SPacketUpdateTileEntity(this.pos, 0, this.getUpdateTag());
     }
 
-    public String getWaystoneName() {
-        return waystoneName;
+    public String getWaystoneName()
+    {
+        return this.waystoneName;
     }
 
-    public boolean isOwner(EntityPlayer player) {
-        return owner == null || player.getGameProfile().getId().equals(owner) || player.capabilities.isCreativeMode;
+    public boolean isOwner(EntityPlayer player)
+    {
+        return this.owner == null || player.getGameProfile().getId().equals(this.owner) || player.capabilities.isCreativeMode;
     }
 
-    public boolean isMossy() {
-        return isMossy;
+    public boolean isMossy()
+    {
+        return this.isMossy;
     }
 
-    public void setMossy(boolean mossy) {
-        isMossy = mossy;
+    public void setMossy(boolean mossy)
+    {
+        this.isMossy = mossy;
     }
 
-    public boolean wasGenerated() {
-        return wasGenerated;
+    public boolean wasGenerated()
+    {
+        return this.wasGenerated;
     }
 
-    public void setWasGenerated(boolean wasGenerated) {
+    public void setWasGenerated(boolean wasGenerated)
+    {
         this.wasGenerated = wasGenerated;
     }
 
-    public void setWaystoneName(String waystoneName) {
+    public void setWaystoneName(String waystoneName)
+    {
         this.waystoneName = waystoneName;
-        IBlockState state = world.getBlockState(pos);
-        world.markAndNotifyBlock(pos, world.getChunkFromBlockCoords(pos), state, state, 3);
-        markDirty();
+        IBlockState state = this.world.getBlockState(this.pos);
+        this.world.markAndNotifyBlock(this.pos, this.world.getChunk(this.pos), state, state, 3);
+        this.markDirty();
     }
 
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
+    {
         return oldState.getBlock() != newSate.getBlock();
     }
 
     @Override
-    public AxisAlignedBB getRenderBoundingBox() {
-        return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1);
+    public AxisAlignedBB getRenderBoundingBox()
+    {
+        return new AxisAlignedBB(this.pos.getX(), this.pos.getY(), this.pos.getZ(), this.pos.getX() + 1, this.pos.getY() + 2, this.pos.getZ() + 1);
     }
 
-    public void setOwner(EntityPlayer owner) {
+    public void setOwner(EntityPlayer owner)
+    {
         this.owner = owner.getGameProfile().getId();
-        markDirty();
+        this.markDirty();
     }
 
-    public boolean isGlobal() {
-        return isGlobal;
+    public boolean isGlobal()
+    {
+        return this.isGlobal;
     }
 
-    public boolean isDummy() {
-        return isDummy;
+    public boolean isDummy()
+    {
+        return this.isDummy;
     }
 
-    public void setGlobal(boolean isGlobal) {
+    public void setGlobal(boolean isGlobal)
+    {
         this.isGlobal = isGlobal;
-        markDirty();
+        this.markDirty();
     }
 
-    public TileWaystone getParent() {
-        if (isDummy) {
-            TileEntity tileBelow = world.getTileEntity(pos.down());
+    public TileWaystone getParent()
+    {
+        if (this.isDummy) {
+            TileEntity tileBelow = this.world.getTileEntity(this.pos.down());
             if (tileBelow instanceof TileWaystone) {
                 return (TileWaystone) tileBelow;
             }

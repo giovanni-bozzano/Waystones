@@ -1,49 +1,59 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        maven { url = 'http://files.minecraftforge.net/maven' }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
 
-apply from: 'gradle/scripts/common.gradle'
-apply from: 'gradle/scripts/with-at.gradle'
+apply plugin: 'net.minecraftforge.gradle'
 
-apply from: 'dependencies.gradle'
+version = major_version + '.' + minor_version
+group = 'net.blay09.mods'
+archivesBaseName = mod_name + '_' + minecraft_version
 
-def BUILD_NUMBER = System.getenv("BUILD_NUMBER") ?: "0"
-
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
-
-version = major_version + "." + minor_version + "." + BUILD_NUMBER
-group = "net.blay09.mods"
-archivesBaseName = mod_name + "_" + minecraft_version
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    version = minecraft_version + "-" + forge_version
-    runDir = "run"
-    useDepAts = true
-    mappings = mappings_version
+    mappings channel: 'stable', version: '39-1.12'
+    runs {
+        client {
+            ideaModule 'Waystones.main'
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'info'
+        }
+        server {
+            ideaModule 'Waystones.main'
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'info'
+        }
+    }
 }
 
-processResources{
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
+}
 
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', minecraft_version
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': minecraft_version
     }
-        
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
 }
 
+jar.finalizedBy('reobfJar')
+
+sourceSets {
+    main {
+        output.resourcesDir = output.classesDir
+    }
+}

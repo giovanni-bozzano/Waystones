@@ -12,20 +12,22 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
 
-public class HandlerWaystones implements IMessageHandler<MessageWaystones, IMessage> {
-
-	@Override
-	@Nullable
-	public IMessage onMessage(final MessageWaystones message, final MessageContext ctx) {
-		NetworkHandler.getThreadListener(ctx).addScheduledTask(new Runnable() {
-			@Override
-			public void run() {
-				ClientWaystones.setKnownWaystones(message.getEntries());
-				PlayerWaystoneHelper.store(FMLClientHandler.instance().getClientPlayerEntity(), message.getEntries(), message.getLastFreeWarp(), message.getLastWarpStoneUse());
-				ItemWarpStone.lastTimerUpdate = System.currentTimeMillis();
-			}
-		});
-		return null;
-	}
-
+public class HandlerWaystones implements IMessageHandler<MessageWaystones, IMessage>
+{
+    @Override
+    @Nullable
+    public IMessage onMessage(final MessageWaystones message, final MessageContext ctx)
+    {
+        NetworkHandler.getThreadListener(ctx).addScheduledTask(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                ClientWaystones.setKnownWaystones(message.getEntries());
+                PlayerWaystoneHelper.store(FMLClientHandler.instance().getClientPlayerEntity(), message.getEntries(), message.getLastFreeWarp(), message.getLastWarpStoneUse());
+                ItemWarpStone.lastTimerUpdate = System.currentTimeMillis();
+            }
+        });
+        return null;
+    }
 }

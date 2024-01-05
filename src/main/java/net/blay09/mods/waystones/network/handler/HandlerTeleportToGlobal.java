@@ -1,12 +1,13 @@
 package net.blay09.mods.waystones.network.handler;
 
-import net.blay09.mods.waystones.*;
+import net.blay09.mods.waystones.GlobalWaystones;
+import net.blay09.mods.waystones.PlayerWaystoneHelper;
+import net.blay09.mods.waystones.WaystoneConfig;
+import net.blay09.mods.waystones.WaystoneManager;
 import net.blay09.mods.waystones.network.NetworkHandler;
 import net.blay09.mods.waystones.network.message.MessageTeleportToGlobal;
-import net.blay09.mods.waystones.network.message.MessageTeleportToWaystone;
 import net.blay09.mods.waystones.util.WaystoneEntry;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -15,18 +16,19 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
 
-public class HandlerTeleportToGlobal implements IMessageHandler<MessageTeleportToGlobal, IMessage> {
-
+public class HandlerTeleportToGlobal implements IMessageHandler<MessageTeleportToGlobal, IMessage>
+{
     @Override
     @Nullable
-    public IMessage onMessage(final MessageTeleportToGlobal message, final MessageContext ctx) {
+    public IMessage onMessage(final MessageTeleportToGlobal message, final MessageContext ctx)
+    {
         NetworkHandler.getThreadListener(ctx).addScheduledTask(() -> {
             if (WaystoneConfig.general.teleportButtonReturnOnly) {
                 return;
             }
 
             EntityPlayer player = ctx.getServerHandler().player;
-            WaystoneEntry waystone = GlobalWaystones.get(player.world).getGlobalWaystone(message.getWaystoneName());
+            WaystoneEntry waystone = GlobalWaystones.get().getGlobalWaystone(message.getWaystoneName());
             if (waystone == null) {
                 player.sendStatusMessage(new TextComponentTranslation("waystones:waystoneBroken"), true);
                 return;
@@ -61,5 +63,4 @@ public class HandlerTeleportToGlobal implements IMessageHandler<MessageTeleportT
         });
         return null;
     }
-
 }

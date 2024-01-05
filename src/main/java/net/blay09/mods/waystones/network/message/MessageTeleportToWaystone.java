@@ -8,59 +8,66 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import javax.annotation.Nullable;
 
-public class MessageTeleportToWaystone implements IMessage {
+public class MessageTeleportToWaystone implements IMessage
+{
+    private WaystoneEntry waystone;
+    private WarpMode warpMode;
+    private EnumHand hand;
+    private WaystoneEntry fromWaystone;
 
-	private WaystoneEntry waystone;
-	private WarpMode warpMode;
-	private EnumHand hand;
-	private WaystoneEntry fromWaystone;
+    public MessageTeleportToWaystone()
+    {
+    }
 
-	public MessageTeleportToWaystone() {
-	}
+    public MessageTeleportToWaystone(WaystoneEntry waystone, WarpMode warpMode, EnumHand hand, @Nullable WaystoneEntry fromWaystone)
+    {
+        this.waystone = waystone;
+        this.warpMode = warpMode;
+        this.hand = hand;
+        this.fromWaystone = fromWaystone;
+    }
 
-	public MessageTeleportToWaystone(WaystoneEntry waystone, WarpMode warpMode, EnumHand hand, @Nullable WaystoneEntry fromWaystone) {
-		this.waystone = waystone;
-		this.warpMode = warpMode;
-		this.hand = hand;
-		this.fromWaystone = fromWaystone;
-	}
+    @Override
+    public void fromBytes(ByteBuf buf)
+    {
+        this.waystone = WaystoneEntry.read(buf);
+        this.warpMode = WarpMode.values()[buf.readByte()];
+        this.hand = (this.warpMode == WarpMode.WARP_SCROLL || this.warpMode == WarpMode.WARP_STONE) ? EnumHand.values()[buf.readByte()] : EnumHand.MAIN_HAND;
+        if (this.warpMode == WarpMode.WAYSTONE) {
+            this.fromWaystone = WaystoneEntry.read(buf);
+        }
+    }
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		waystone = WaystoneEntry.read(buf);
-		warpMode = WarpMode.values()[buf.readByte()];
-		hand = (warpMode == WarpMode.WARP_SCROLL || warpMode == WarpMode.WARP_STONE) ? EnumHand.values()[buf.readByte()] : EnumHand.MAIN_HAND;
-		if(warpMode == WarpMode.WAYSTONE) {
-			fromWaystone = WaystoneEntry.read(buf);
-		}
-	}
+    @Override
+    public void toBytes(ByteBuf buf)
+    {
+        this.waystone.write(buf);
+        buf.writeByte(this.warpMode.ordinal());
+        if (this.warpMode == WarpMode.WARP_SCROLL || this.warpMode == WarpMode.WARP_STONE) {
+            buf.writeByte(this.hand.ordinal());
+        } else if (this.warpMode == WarpMode.WAYSTONE) {
+            this.fromWaystone.write(buf);
+        }
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		waystone.write(buf);
-		buf.writeByte(warpMode.ordinal());
-		if(warpMode == WarpMode.WARP_SCROLL || warpMode == WarpMode.WARP_STONE) {
-			buf.writeByte(hand.ordinal());
-		} else if(warpMode == WarpMode.WAYSTONE) {
-			fromWaystone.write(buf);
-		}
-	}
+    public WaystoneEntry getWaystone()
+    {
+        return this.waystone;
+    }
 
-	public WaystoneEntry getWaystone() {
-		return waystone;
-	}
+    @Nullable
+    public WaystoneEntry getFromWaystone()
+    {
+        return this.fromWaystone;
+    }
 
-	@Nullable
-	public WaystoneEntry getFromWaystone() {
-		return fromWaystone;
-	}
+    public WarpMode getWarpMode()
+    {
+        return this.warpMode;
+    }
 
-	public WarpMode getWarpMode() {
-		return warpMode;
-	}
-
-	public EnumHand getHand() {
-		return hand;
-	}
-
+    public EnumHand getHand()
+    {
+        return this.hand;
+    }
 }

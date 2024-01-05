@@ -6,23 +6,26 @@ import net.blay09.mods.waystones.util.WaystoneEntry;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public class ClientWaystones {
+public class ClientWaystones
+{
+    private static final Map<String, WaystoneEntry> knownWaystones = Maps.newHashMap();
 
-	private static final Map<String, WaystoneEntry> knownWaystones = Maps.newHashMap();
+    public static void setKnownWaystones(WaystoneEntry[] entries)
+    {
+        knownWaystones.clear();
+        for (WaystoneEntry entry : entries) {
+            knownWaystones.put(entry.getName(), entry);
+        }
+    }
 
-	public static void setKnownWaystones(WaystoneEntry[] entries) {
-		knownWaystones.clear();
-		for(WaystoneEntry entry : entries) {
-			knownWaystones.put(entry.getName(), entry);
-		}
-	}
+    @Nullable
+    public static WaystoneEntry getKnownWaystone(String name)
+    {
+        return knownWaystones.get(name);
+    }
 
-	@Nullable
-	public static WaystoneEntry getKnownWaystone(String name) {
-		return knownWaystones.get(name);
-	}
-
-	public static WaystoneEntry[] getKnownWaystones() {
-		return knownWaystones.values().toArray(new WaystoneEntry[knownWaystones.size()]);
-	}
+    public static WaystoneEntry[] getKnownWaystones()
+    {
+        return knownWaystones.values().toArray(new WaystoneEntry[knownWaystones.size()]);
+    }
 }

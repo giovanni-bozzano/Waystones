@@ -28,28 +28,30 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemWarpStone extends Item implements IResetUseOnDamage {
-
+public class ItemWarpStone extends Item implements IResetUseOnDamage
+{
     public static final String name = "warp_stone";
     public static final ResourceLocation registryName = new ResourceLocation(Waystones.MOD_ID, name);
-
     public static long lastTimerUpdate;
 
-    public ItemWarpStone() {
-        setRegistryName(name);
-        setUnlocalizedName(registryName.toString());
-        setCreativeTab(Waystones.creativeTab);
-        setMaxStackSize(1);
-        setMaxDamage(100);
+    public ItemWarpStone()
+    {
+        this.setRegistryName(name);
+        this.setTranslationKey(registryName.toString());
+        this.setCreativeTab(Waystones.creativeTab);
+        this.setMaxStackSize(1);
+        this.setMaxDamage(100);
     }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack itemStack) {
+    public int getMaxItemUseDuration(ItemStack itemStack)
+    {
         return WaystoneConfig.general.warpStoneUseTime;
     }
 
     @Override
-    public EnumAction getItemUseAction(ItemStack itemStack) {
+    public EnumAction getItemUseAction(ItemStack itemStack)
+    {
         if (Waystones.proxy.isVivecraftInstalled()) {
             return EnumAction.NONE;
         }
@@ -58,7 +60,8 @@ public class ItemWarpStone extends Item implements IResetUseOnDamage {
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack itemStack, World world, EntityLivingBase entityLiving) {
+    public ItemStack onItemUseFinish(ItemStack itemStack, World world, EntityLivingBase entityLiving)
+    {
         if (world.isRemote && entityLiving instanceof EntityPlayer) {
             Waystones.proxy.openWaystoneSelection((EntityPlayer) entityLiving, WarpMode.WARP_STONE, entityLiving.getActiveHand(), null);
         }
@@ -67,7 +70,8 @@ public class ItemWarpStone extends Item implements IResetUseOnDamage {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+    {
         ItemStack itemStack = player.getHeldItem(hand);
         if (player.capabilities.isCreativeMode) {
             PlayerWaystoneHelper.setLastWarpStoneUse(player, 0);
@@ -77,7 +81,7 @@ public class ItemWarpStone extends Item implements IResetUseOnDamage {
                 Waystones.proxy.playSound(SoundEvents.BLOCK_PORTAL_TRIGGER, new BlockPos(player.posX, player.posY, player.posZ), 2f);
             }
             if (Waystones.proxy.isVivecraftInstalled()) {
-                onItemUseFinish(itemStack, world, player);
+                this.onItemUseFinish(itemStack, world, player);
             } else {
                 player.setActiveHand(hand);
             }
@@ -90,13 +94,15 @@ public class ItemWarpStone extends Item implements IResetUseOnDamage {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean showDurabilityBar(ItemStack itemStack) {
-        return getDurabilityForDisplay(itemStack) > 0;
+    public boolean showDurabilityBar(ItemStack itemStack)
+    {
+        return this.getDurabilityForDisplay(itemStack) > 0;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public double getDurabilityForDisplay(ItemStack stack) {
+    public double getDurabilityForDisplay(ItemStack stack)
+    {
         EntityPlayer player = FMLClientHandler.instance().getClientPlayerEntity();
         if (player == null) {
             return 0.0;
@@ -110,13 +116,15 @@ public class ItemWarpStone extends Item implements IResetUseOnDamage {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean hasEffect(ItemStack itemStack) {
+    public boolean hasEffect(ItemStack itemStack)
+    {
         return PlayerWaystoneHelper.canUseWarpStone(FMLClientHandler.instance().getClientPlayerEntity());
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag)
+    {
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player == null) {
             return;
@@ -128,5 +136,4 @@ public class ItemWarpStone extends Item implements IResetUseOnDamage {
             tooltip.add(TextFormatting.GRAY + I18n.format("tooltip.waystones:cooldownLeft", secondsLeft));
         }
     }
-
 }

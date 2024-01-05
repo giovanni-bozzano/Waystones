@@ -10,17 +10,18 @@ import net.blay09.mods.waystones.network.message.MessageTeleportToWaystone;
 import net.blay09.mods.waystones.util.WaystoneEntry;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
 
-public class HandlerTeleportToWaystone implements IMessageHandler<MessageTeleportToWaystone, IMessage> {
+public class HandlerTeleportToWaystone implements IMessageHandler<MessageTeleportToWaystone, IMessage>
+{
     @Override
     @Nullable
-    public IMessage onMessage(final MessageTeleportToWaystone message, final MessageContext ctx) {
+    public IMessage onMessage(final MessageTeleportToWaystone message, final MessageContext ctx)
+    {
         NetworkHandler.getThreadListener(ctx).addScheduledTask(() -> {
             EntityPlayer player = ctx.getServerHandler().player;
             TileWaystone tileWaystone = WaystoneManager.getWaystoneInWorld(message.getWaystone());

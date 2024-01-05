@@ -6,43 +6,51 @@ import net.blay09.mods.waystones.util.WaystoneEntry;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
-public class MessageOpenWaystoneSelection implements IMessage {
+public class MessageOpenWaystoneSelection implements IMessage
+{
     private WarpMode warpMode;
-	private EnumHand hand;
-	private WaystoneEntry waystone;
+    private EnumHand hand;
+    private WaystoneEntry waystone;
 
-    public MessageOpenWaystoneSelection() {
+    public MessageOpenWaystoneSelection()
+    {
     }
 
-    public MessageOpenWaystoneSelection(WarpMode warpMode, EnumHand hand, WaystoneEntry waystone) {
+    public MessageOpenWaystoneSelection(WarpMode warpMode, EnumHand hand, WaystoneEntry waystone)
+    {
         this.warpMode = warpMode;
         this.hand = hand;
         this.waystone = waystone;
     }
 
     @Override
-    public void fromBytes(ByteBuf buf) {
-        warpMode = WarpMode.values()[buf.readByte()];
-        hand = EnumHand.values()[buf.readByte()];
-        waystone = WaystoneEntry.read(buf);
+    public void fromBytes(ByteBuf buf)
+    {
+        this.warpMode = WarpMode.values()[buf.readByte()];
+        this.hand = EnumHand.values()[buf.readByte()];
+        this.waystone = WaystoneEntry.read(buf);
     }
 
     @Override
-    public void toBytes(ByteBuf buf) {
-        buf.writeByte(warpMode.ordinal());
-        buf.writeByte(hand.ordinal());
-        waystone.write(buf);
+    public void toBytes(ByteBuf buf)
+    {
+        buf.writeByte(this.warpMode.ordinal());
+        buf.writeByte(this.hand.ordinal());
+        this.waystone.write(buf);
     }
 
-    public WarpMode getWarpMode() {
-        return warpMode;
+    public WarpMode getWarpMode()
+    {
+        return this.warpMode;
     }
 
-    public EnumHand getHand() {
-        return hand;
+    public EnumHand getHand()
+    {
+        return this.hand;
     }
 
-    public WaystoneEntry getWaystone() {
-        return waystone;
+    public WaystoneEntry getWaystone()
+    {
+        return this.waystone;
     }
 }

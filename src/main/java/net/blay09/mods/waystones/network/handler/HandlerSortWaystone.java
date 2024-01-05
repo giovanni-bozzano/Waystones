@@ -11,24 +11,26 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
 
-public class HandlerSortWaystone implements IMessageHandler<MessageSortWaystone, IMessage> {
-	@Override
-	@Nullable
-	public IMessage onMessage(final MessageSortWaystone message, final MessageContext ctx) {
-		NetworkHandler.getThreadListener(ctx).addScheduledTask(() -> {
-			PlayerWaystoneData waystoneData = PlayerWaystoneData.fromPlayer(ctx.getServerHandler().player);
-			WaystoneEntry[] entries = waystoneData.getWaystones();
-			int index = message.getIndex();
-			int otherIndex = message.getOtherIndex();
-			if(index < 0 || index >= entries.length || otherIndex < 0 || otherIndex >= entries.length) {
-				return;
-			}
-			WaystoneEntry swap = entries[index];
-			entries[index] = entries[otherIndex];
-			entries[otherIndex] = swap;
-			waystoneData.store(ctx.getServerHandler().player);
-			WaystoneManager.sendPlayerWaystones(ctx.getServerHandler().player);
-		});
-		return null;
-	}
+public class HandlerSortWaystone implements IMessageHandler<MessageSortWaystone, IMessage>
+{
+    @Override
+    @Nullable
+    public IMessage onMessage(final MessageSortWaystone message, final MessageContext ctx)
+    {
+        NetworkHandler.getThreadListener(ctx).addScheduledTask(() -> {
+            PlayerWaystoneData waystoneData = PlayerWaystoneData.fromPlayer(ctx.getServerHandler().player);
+            WaystoneEntry[] entries = waystoneData.getWaystones();
+            int index = message.getIndex();
+            int otherIndex = message.getOtherIndex();
+            if (index < 0 || index >= entries.length || otherIndex < 0 || otherIndex >= entries.length) {
+                return;
+            }
+            WaystoneEntry swap = entries[index];
+            entries[index] = entries[otherIndex];
+            entries[otherIndex] = swap;
+            waystoneData.store(ctx.getServerHandler().player);
+            WaystoneManager.sendPlayerWaystones(ctx.getServerHandler().player);
+        });
+        return null;
+    }
 }

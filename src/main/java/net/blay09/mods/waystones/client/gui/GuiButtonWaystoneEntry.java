@@ -16,14 +16,14 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
-public class GuiButtonWaystoneEntry extends GuiButton {
-
+public class GuiButtonWaystoneEntry extends GuiButton
+{
     private static final ResourceLocation ENCHANTMENT_TABLE_GUI_TEXTURE = new ResourceLocation("textures/gui/container/enchanting_table.png");
-
     private final WaystoneEntry waystone;
     private final int xpLevelCost;
 
-    public GuiButtonWaystoneEntry(int id, int x, int y, WaystoneEntry waystone, WarpMode mode) {
+    public GuiButtonWaystoneEntry(int id, int x, int y, WaystoneEntry waystone, WarpMode mode)
+    {
         super(id, x, y, (waystone.isGlobal() ? TextFormatting.YELLOW : "") + waystone.getName());
         this.waystone = waystone;
         EntityPlayer player = FMLClientHandler.instance().getClientPlayerEntity();
@@ -48,38 +48,39 @@ public class GuiButtonWaystoneEntry extends GuiButton {
 
         if (waystone.getDimensionId() != Minecraft.getMinecraft().world.provider.getDimension()) {
             if (!WaystoneManager.isDimensionWarpAllowed(waystone)) {
-                enabled = false;
+                this.enabled = false;
             }
         }
 
-        if (player.experienceLevel < xpLevelCost && !player.capabilities.isCreativeMode) {
-            enabled = false;
+        if (player.experienceLevel < this.xpLevelCost && !player.capabilities.isCreativeMode) {
+            this.enabled = false;
         }
     }
 
-    public WaystoneEntry getWaystone() {
-        return waystone;
+    public WaystoneEntry getWaystone()
+    {
+        return this.waystone;
     }
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
+    {
         super.drawButton(mc, mouseX, mouseY, partialTicks);
         GlStateManager.color(1f, 1f, 1f, 1f);
 
-        if (xpLevelCost > 0) {
-            boolean canAfford = mc.player.experienceLevel >= xpLevelCost || mc.player.capabilities.isCreativeMode;
+        if (this.xpLevelCost > 0) {
+            boolean canAfford = mc.player.experienceLevel >= this.xpLevelCost || mc.player.capabilities.isCreativeMode;
             mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_GUI_TEXTURE);
-            drawTexturedModalRect(x + 2, y + 2, (Math.min(xpLevelCost, 3) - 1) * 16, 223 + (!canAfford ? 16 : 0), 16, 16);
+            this.drawTexturedModalRect(this.x + 2, this.y + 2, (Math.min(this.xpLevelCost, 3) - 1) * 16, 223 + (!canAfford ? 16 : 0), 16, 16);
 
-            if (xpLevelCost > 3) {
-                mc.fontRenderer.drawString("+", x + 17, y + 6, 0xC8FF8F, true);
+            if (this.xpLevelCost > 3) {
+                mc.fontRenderer.drawString("+", this.x + 17, this.y + 6, 0xC8FF8F, true);
             }
 
-            if (hovered && mouseX <= x + 16) {
-                GuiUtils.drawHoveringText(Lists.newArrayList((canAfford ? TextFormatting.GREEN : TextFormatting.RED) + I18n.format("tooltip.waystones:levelRequirement", xpLevelCost)), mouseX, mouseY + mc.fontRenderer.FONT_HEIGHT, mc.displayWidth, mc.displayHeight, 200, mc.fontRenderer);
+            if (this.hovered && mouseX <= this.x + 16) {
+                GuiUtils.drawHoveringText(Lists.newArrayList((canAfford ? TextFormatting.GREEN : TextFormatting.RED) + I18n.format("tooltip.waystones:levelRequirement", this.xpLevelCost)), mouseX, mouseY + mc.fontRenderer.FONT_HEIGHT, mc.displayWidth, mc.displayHeight, 200, mc.fontRenderer);
             }
             GlStateManager.disableLighting();
         }
     }
-
 }

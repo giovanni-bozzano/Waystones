@@ -11,13 +11,17 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
 
-public class HandlerOpenWaystoneSelection implements IMessageHandler<MessageOpenWaystoneSelection, IMessage> {
+public class HandlerOpenWaystoneSelection implements IMessageHandler<MessageOpenWaystoneSelection, IMessage>
+{
     @Override
     @Nullable
-    public IMessage onMessage(final MessageOpenWaystoneSelection message, MessageContext ctx) {
-        NetworkHandler.getThreadListener(ctx).addScheduledTask(new Runnable() {
+    public IMessage onMessage(final MessageOpenWaystoneSelection message, MessageContext ctx)
+    {
+        NetworkHandler.getThreadListener(ctx).addScheduledTask(new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 EntityPlayer player = Minecraft.getMinecraft().player;
                 Waystones.proxy.openWaystoneSelection(player, message.getWarpMode(), message.getHand(), message.getWaystone());
             }

@@ -23,26 +23,28 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemWarpScroll extends Item implements IResetUseOnDamage {
-
+public class ItemWarpScroll extends Item implements IResetUseOnDamage
+{
     private static final String NBT_WARP_SCROLL_TARGET = "WarpScrollTarget";
-
     public static final String name = "warp_scroll";
     public static final ResourceLocation registryName = new ResourceLocation(Waystones.MOD_ID, name);
 
-    public ItemWarpScroll() {
-        setCreativeTab(Waystones.creativeTab);
-        setRegistryName(name);
-        setUnlocalizedName(registryName.toString());
+    public ItemWarpScroll()
+    {
+        this.setCreativeTab(Waystones.creativeTab);
+        this.setRegistryName(name);
+        this.setTranslationKey(registryName.toString());
     }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack itemStack) {
+    public int getMaxItemUseDuration(ItemStack itemStack)
+    {
         return WaystoneConfig.general.warpScrollUseTime;
     }
 
     @Override
-    public EnumAction getItemUseAction(ItemStack itemStack) {
+    public EnumAction getItemUseAction(ItemStack itemStack)
+    {
         if (Waystones.proxy.isVivecraftInstalled()) {
             return EnumAction.NONE;
         }
@@ -51,17 +53,19 @@ public class ItemWarpScroll extends Item implements IResetUseOnDamage {
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack) {
+    public String getTranslationKey(ItemStack stack)
+    {
         NBTTagCompound compound = stack.getTagCompound();
         if (compound != null && compound.hasKey(NBT_WARP_SCROLL_TARGET, Constants.NBT.TAG_LIST)) {
             return "item.waystones:warp_scroll_bound";
         }
 
-        return super.getUnlocalizedName(stack);
+        return super.getTranslationKey(stack);
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack itemStack, World world, EntityLivingBase entityLiving) {
+    public ItemStack onItemUseFinish(ItemStack itemStack, World world, EntityLivingBase entityLiving)
+    {
         NBTTagCompound compound = itemStack.getTagCompound();
         if (compound != null && compound.hasKey(NBT_WARP_SCROLL_TARGET, Constants.NBT.TAG_LIST)) {
             if (!world.isRemote && entityLiving instanceof EntityPlayer) {
@@ -83,13 +87,14 @@ public class ItemWarpScroll extends Item implements IResetUseOnDamage {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+    {
         ItemStack itemStack = player.getHeldItem(hand);
         if (!player.isHandActive() && world.isRemote) {
             Waystones.proxy.playSound(SoundEvents.BLOCK_PORTAL_TRIGGER, new BlockPos(player.posX, player.posY, player.posZ), 2f);
         }
         if (Waystones.proxy.isVivecraftInstalled()) {
-            onItemUseFinish(itemStack, world, player);
+            this.onItemUseFinish(itemStack, world, player);
         } else {
             player.setActiveHand(hand);
         }
@@ -98,9 +103,8 @@ public class ItemWarpScroll extends Item implements IResetUseOnDamage {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean hasEffect(ItemStack itemStack) {
+    public boolean hasEffect(ItemStack itemStack)
+    {
         return true;
     }
-
-
 }

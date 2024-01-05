@@ -34,33 +34,34 @@ import net.minecraftforge.common.MinecraftForge;
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class BlockWaystone extends BlockContainer {
-
+public class BlockWaystone extends BlockContainer
+{
     public static final String name = "waystone";
     public static final ResourceLocation registryName = new ResourceLocation(Waystones.MOD_ID, name);
-
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
     public static final PropertyBool BASE = PropertyBool.create("base");
-
     private static final StatBase WAYSTONE_ACTIVATED = (new StatBasic("stat.waystones:waystonesActivated", new TextComponentTranslation("stat.waystones:waystonesActivated"))).registerStat();
 
-    public BlockWaystone() {
+    public BlockWaystone()
+    {
         super(Material.ROCK);
 
-        setRegistryName(name);
-        setUnlocalizedName(registryName.toString());
-        setHardness(5f);
-        setResistance(2000f);
-        setCreativeTab(Waystones.creativeTab);
+        this.setRegistryName(name);
+        this.setTranslationKey(registryName.toString());
+        this.setHardness(5f);
+        this.setResistance(2000f);
+        this.setCreativeTab(Waystones.creativeTab);
     }
 
     @Override
-    protected BlockStateContainer createBlockState() {
+    protected BlockStateContainer createBlockState()
+    {
         return new BlockStateContainer(this, FACING, BASE);
     }
 
     @Override
-    public int getMetaFromState(IBlockState state) {
+    public int getMetaFromState(IBlockState state)
+    {
         int meta = state.getValue(FACING).getIndex();
         if (state.getValue(BASE)) {
             meta |= 8;
@@ -70,41 +71,46 @@ public class BlockWaystone extends BlockContainer {
 
     @Override
     @SuppressWarnings("deprecation")
-    public IBlockState getStateFromMeta(int meta) {
-        EnumFacing facing = EnumFacing.getFront(meta & 7);
+    public IBlockState getStateFromMeta(int meta)
+    {
+        EnumFacing facing = EnumFacing.byIndex(meta & 7);
         if (facing.getAxis() == EnumFacing.Axis.Y) {
             facing = EnumFacing.NORTH;
         }
         boolean isBase = (meta & 8) > 0;
-        return getDefaultState().withProperty(FACING, facing).withProperty(BASE, isBase);
+        return this.getDefaultState().withProperty(FACING, facing).withProperty(BASE, isBase);
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean isOpaqueCube(IBlockState state) {
+    public boolean isOpaqueCube(IBlockState state)
+    {
         return false;
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean isFullCube(IBlockState state) {
+    public boolean isFullCube(IBlockState state)
+    {
         return false;
     }
 
     @Override
     @Nullable
-    public TileEntity createNewTileEntity(World world, int metadata) {
-        return new TileWaystone(!getStateFromMeta(metadata).getValue(BASE));
+    public TileEntity createNewTileEntity(World world, int metadata)
+    {
+        return new TileWaystone(!this.getStateFromMeta(metadata).getValue(BASE));
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World world, BlockPos pos) {
+    public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World world, BlockPos pos)
+    {
         if (WaystoneConfig.general.creativeModeOnly && !player.capabilities.isCreativeMode) {
             return -1f;
         }
 
-        TileWaystone tileWaystone = getTileWaystone(world, pos);
+        TileWaystone tileWaystone = this.getTileWaystone(world, pos);
         if (tileWaystone != null && !player.capabilities.isCreativeMode) {
             if (tileWaystone.wasGenerated() && WaystoneConfig.general.disallowBreakingGenerated) {
                 return -1f;
@@ -119,7 +125,8 @@ public class BlockWaystone extends BlockContainer {
     }
 
     @Override
-    public boolean canPlaceBlockAt(World world, BlockPos pos) {
+    public boolean canPlaceBlockAt(World world, BlockPos pos)
+    {
         Block blockBelow = world.getBlockState(pos.down()).getBlock();
         if (blockBelow == this) {
             return false;
@@ -130,17 +137,19 @@ public class BlockWaystone extends BlockContainer {
     }
 
     @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand)
+    {
         EnumFacing facing = EnumFacing.getDirectionFromEntityLiving(pos, placer);
         if (facing.getAxis() == EnumFacing.Axis.Y) {
             facing = EnumFacing.NORTH;
         }
 
-        return getDefaultState().withProperty(FACING, facing).withProperty(BASE, true);
+        return this.getDefaultState().withProperty(FACING, facing).withProperty(BASE, true);
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
+    {
         world.setBlockState(pos.up(), this.getDefaultState().withProperty(BASE, false));
         if (placer instanceof EntityPlayer && (!WaystoneConfig.general.creativeModeOnly || ((EntityPlayer) placer).capabilities.isCreativeMode)) {
             TileWaystone tileWaystone = (TileWaystone) world.getTileEntity(pos);
@@ -153,8 +162,9 @@ public class BlockWaystone extends BlockContainer {
     }
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state) {
-        TileWaystone tileWaystone = getTileWaystone(world, pos);
+    public void breakBlock(World world, BlockPos pos, IBlockState state)
+    {
+        TileWaystone tileWaystone = this.getTileWaystone(world, pos);
         if (tileWaystone != null) {
 
             // We're copying the wasGenerated flag to the top half of the TE so it can be accessed in harvestBlock().
@@ -167,7 +177,7 @@ public class BlockWaystone extends BlockContainer {
 
             WaystoneEntry entry = new WaystoneEntry(tileWaystone);
             if (tileWaystone.isGlobal()) {
-                GlobalWaystones.get(world).removeGlobalWaystone(entry);
+                GlobalWaystones.get().removeGlobalWaystone(entry);
             }
             for (EntityPlayer player : world.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB(pos).grow(64, 64, 64))) {
                 WaystoneManager.removePlayerWaystone(player, entry);
@@ -185,7 +195,8 @@ public class BlockWaystone extends BlockContainer {
     }
 
     @Override
-    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
+    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack)
+    {
         TileWaystone tileWaystone = (TileWaystone) te;
         if (tileWaystone != null && tileWaystone.wasGenerated() && !WaystoneConfig.general.dropGenerated) {
             return;
@@ -194,9 +205,10 @@ public class BlockWaystone extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    {
         if (player.isSneaking() && (player.capabilities.isCreativeMode || !WaystoneConfig.general.creativeModeOnly)) {
-            TileWaystone tileWaystone = getTileWaystone(world, pos);
+            TileWaystone tileWaystone = this.getTileWaystone(world, pos);
             if (tileWaystone == null) {
                 return true;
             }
@@ -217,7 +229,7 @@ public class BlockWaystone extends BlockContainer {
             return true;
         }
 
-        TileWaystone tileWaystone = getTileWaystone(world, pos);
+        TileWaystone tileWaystone = this.getTileWaystone(world, pos);
         if (tileWaystone == null) {
             return true;
         }
@@ -226,13 +238,14 @@ public class BlockWaystone extends BlockContainer {
         if (knownWaystone != null) {
             Waystones.proxy.openWaystoneSelection(player, WarpMode.WAYSTONE, EnumHand.MAIN_HAND, knownWaystone);
         } else {
-            activateWaystone(player, world, tileWaystone);
+            this.activateWaystone(player, world, tileWaystone);
         }
 
         return true;
     }
 
-    public void activateWaystone(EntityPlayer player, World world, TileWaystone tileWaystone) {
+    public void activateWaystone(EntityPlayer player, World world, TileWaystone tileWaystone)
+    {
         BlockPos pos = tileWaystone.getPos();
         if (!world.isRemote) {
             WaystoneEntry waystone = new WaystoneEntry(tileWaystone);
@@ -266,9 +279,10 @@ public class BlockWaystone extends BlockContainer {
     }
 
     @Override
-    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand)
+    {
         if (!WaystoneConfig.client.disableParticles && rand.nextFloat() < 0.75f) {
-            TileWaystone tileWaystone = getTileWaystone(world, pos);
+            TileWaystone tileWaystone = this.getTileWaystone(world, pos);
             if (tileWaystone == null) {
                 return;
             }
@@ -280,14 +294,16 @@ public class BlockWaystone extends BlockContainer {
     }
 
     @Nullable
-    public TileWaystone getTileWaystone(World world, BlockPos pos) {
+    public TileWaystone getTileWaystone(World world, BlockPos pos)
+    {
         TileWaystone tileWaystone = (TileWaystone) world.getTileEntity(pos);
         return tileWaystone != null ? tileWaystone.getParent() : null;
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean hasCustomBreakingProgress(IBlockState state) {
+    public boolean hasCustomBreakingProgress(IBlockState state)
+    {
         return true;
     }
 }

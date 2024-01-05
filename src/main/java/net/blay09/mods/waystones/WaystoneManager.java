@@ -2,14 +2,13 @@ package net.blay09.mods.waystones;
 
 import net.blay09.mods.waystones.block.BlockWaystone;
 import net.blay09.mods.waystones.block.TileWaystone;
+import net.blay09.mods.waystones.network.NetworkHandler;
 import net.blay09.mods.waystones.network.message.MessageTeleportEffect;
 import net.blay09.mods.waystones.network.message.MessageWaystones;
-import net.blay09.mods.waystones.network.NetworkHandler;
 import net.blay09.mods.waystones.util.WaystoneEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.MobEffects;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.play.server.SPacketEntityEffect;
@@ -32,24 +31,40 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
-public class WaystoneManager {
+public class WaystoneManager
+{
+    public static void sendPlayerWaystones(EntityPlayer player, List<WaystoneEntry> waystoneList)
+    {
+        if (player instanceof EntityPlayerMP) {
+            WaystoneEntry[] entries = waystoneList.toArray(new WaystoneEntry[0]);
+            NBTTagCompound tagCompound = PlayerWaystoneHelper.getWaystonesTag(player);
+            long lastFreeWarp = tagCompound.getLong(PlayerWaystoneHelper.LAST_FREE_WARP);
+            long lastWarpStoneUse = tagCompound.getLong(PlayerWaystoneHelper.LAST_WARP_STONE_USE);
+            PlayerWaystoneData waystoneData = new PlayerWaystoneData(entries, lastFreeWarp, lastWarpStoneUse);
+            NetworkHandler.channel.sendTo(new MessageWaystones(waystoneData.getWaystones(), waystoneData.getLastFreeWarp(), waystoneData.getLastWarpStoneUse()), (EntityPlayerMP) player);
+        }
+    }
 
-    public static void sendPlayerWaystones(EntityPlayer player) {
+    public static void sendPlayerWaystones(EntityPlayer player)
+    {
         if (player instanceof EntityPlayerMP) {
             PlayerWaystoneData waystoneData = PlayerWaystoneData.fromPlayer(player);
             NetworkHandler.channel.sendTo(new MessageWaystones(waystoneData.getWaystones(), waystoneData.getLastFreeWarp(), waystoneData.getLastWarpStoneUse()), (EntityPlayerMP) player);
         }
     }
 
-    public static void addPlayerWaystone(EntityPlayer player, WaystoneEntry waystone) {
+    public static void addPlayerWaystone(EntityPlayer player, WaystoneEntry waystone)
+    {
         NBTTagCompound tagCompound = PlayerWaystoneHelper.getOrCreateWaystonesTag(player);
         NBTTagList tagList = tagCompound.getTagList(PlayerWaystoneHelper.WAYSTONE_LIST, Constants.NBT.TAG_COMPOUND);
         tagList.appendTag(waystone.writeToNBT());
         tagCompound.setTag(PlayerWaystoneHelper.WAYSTONE_LIST, tagList);
     }
 
-    public static boolean removePlayerWaystone(EntityPlayer player, WaystoneEntry waystone) {
+    public static boolean removePlayerWaystone(EntityPlayer player, WaystoneEntry waystone)
+    {
         NBTTagCompound tagCompound = PlayerWaystoneHelper.getWaystonesTag(player);
         NBTTagList tagList = tagCompound.getTagList(PlayerWaystoneHelper.WAYSTONE_LIST, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.tagCount(); i++) {
@@ -63,7 +78,8 @@ public class WaystoneManager {
         return false;
     }
 
-    public static boolean checkAndUpdateWaystone(EntityPlayer player, WaystoneEntry waystone) {
+    public static boolean checkAndUpdateWaystone(EntityPlayer player, WaystoneEntry waystone)
+    {
         NBTTagCompound tagCompound = PlayerWaystoneHelper.getWaystonesTag(player);
         NBTTagList tagList = tagCompound.getTagList(PlayerWaystoneHelper.WAYSTONE_LIST, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.tagCount(); i++) {
@@ -78,7 +94,7 @@ public class WaystoneManager {
                     return true;
                 } else {
                     if (waystone.isGlobal()) {
-                        GlobalWaystones.get(player.world).removeGlobalWaystone(waystone);
+                        GlobalWaystones.get().removeGlobalWaystone(waystone);
                     }
                     removePlayerWaystone(player, waystone);
                     sendPlayerWaystones(player);
@@ -90,7 +106,8 @@ public class WaystoneManager {
     }
 
     @Nullable
-    public static TileWaystone getWaystoneInWorld(WaystoneEntry waystone) {
+    public static TileWaystone getWaystoneInWorld(WaystoneEntry waystone)
+    {
         World targetWorld = DimensionManager.getWorld(waystone.getDimensionId());
         if (targetWorld == null) {
             DimensionManager.initDimension(waystone.getDimensionId());
@@ -105,11 +122,13 @@ public class WaystoneManager {
         return null;
     }
 
-    public static boolean isDimensionWarpAllowed(WaystoneEntry waystone) {
+    public static boolean isDimensionWarpAllowed(WaystoneEntry waystone)
+    {
         return waystone.isGlobal() ? WaystoneConfig.general.globalInterDimension : WaystoneConfig.general.interDimension;
     }
 
-    public static boolean teleportToWaystone(EntityPlayer player, WaystoneEntry waystone) {
+    public static boolean teleportToWaystone(EntityPlayer player, WaystoneEntry waystone)
+    {
         if (!checkAndUpdateWaystone(player, waystone)) {
             TextComponentTranslation chatComponent = new TextComponentTranslation("waystones:waystoneBroken");
             chatComponent.getStyle().setColor(TextFormatting.RED);
@@ -130,12 +149,14 @@ public class WaystoneManager {
         return true;
     }
 
-    public static void teleportToPosition(EntityPlayer player, World world, BlockPos pos, EnumFacing facing, int dimensionId) {
+    public static void teleportToPosition(EntityPlayer player, World world, BlockPos pos, EnumFacing facing, int dimensionId)
+    {
         sendTeleportEffect(player.world, new BlockPos(player));
         if (dimensionId != player.getEntityWorld().provider.getDimension()) {
             MinecraftServer server = player.world.getMinecraftServer();
             if (server != null) {
-                transferPlayerToDimension((EntityPlayerMP) player, dimensionId, server.getPlayerList());
+                teleportToDimension(player, dimensionId, pos.getX(), pos.getY(), pos.getZ());
+                // transferPlayerToDimension((EntityPlayerMP) player, dimensionId, server.getPlayerList());
             }
         } else {
             if (player.isBeingRidden()) {
@@ -150,10 +171,19 @@ public class WaystoneManager {
         sendTeleportEffect(player.world, pos);
     }
 
+    public static void teleportToDimension(EntityPlayer player, int dimension, double x, double y, double z)
+    {
+        EntityPlayerMP entityPlayerMP = (EntityPlayerMP) player;
+        MinecraftServer server = player.getEntityWorld().getMinecraftServer();
+        WorldServer worldServer = server.getWorld(dimension);
+        worldServer.getMinecraftServer().getPlayerList().transferPlayerToDimension(entityPlayerMP, dimension, new CustomTeleporter(worldServer, x, y, z));
+    }
+
     /**
      * Taken from CoFHCore's EntityHelper (https://github.com/CoFH/CoFHCore/blob/1.12/src/main/java/cofh/core/util/helpers/EntityHelper.java)
      */
-    private static void transferPlayerToDimension(EntityPlayerMP player, int dimension, PlayerList manager) {
+    private static void transferPlayerToDimension(EntityPlayerMP player, int dimension, PlayerList manager)
+    {
         int oldDim = player.dimension;
         WorldServer oldWorld = manager.getServerInstance().getWorld(player.dimension);
         player.dimension = dimension;
@@ -183,7 +213,8 @@ public class WaystoneManager {
     /**
      * Taken from CoFHCore's EntityHelper (https://github.com/CoFH/CoFHCore/blob/1.12/src/main/java/cofh/core/util/helpers/EntityHelper.java)
      */
-    private static void transferEntityToWorld(Entity entity, WorldServer oldWorld, WorldServer newWorld) {
+    private static void transferEntityToWorld(Entity entity, WorldServer oldWorld, WorldServer newWorld)
+    {
         WorldProvider oldWorldProvider = oldWorld.provider;
         WorldProvider newWorldProvider = newWorld.provider;
         double moveFactor = oldWorldProvider.getMovementFactor() / newWorldProvider.getMovementFactor();
@@ -203,11 +234,13 @@ public class WaystoneManager {
         entity.setWorld(newWorld);
     }
 
-    public static void sendTeleportEffect(World world, BlockPos pos) {
+    public static void sendTeleportEffect(World world, BlockPos pos)
+    {
         NetworkHandler.channel.sendToAllAround(new MessageTeleportEffect(pos), new NetworkRegistry.TargetPoint(world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 64));
     }
 
-    public static float getRotationYaw(EnumFacing facing) {
+    public static float getRotationYaw(EnumFacing facing)
+    {
         switch (facing) {
             case NORTH:
                 return 180f;
@@ -220,5 +253,4 @@ public class WaystoneManager {
         }
         return 0f;
     }
-
 }

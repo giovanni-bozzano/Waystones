@@ -17,87 +17,93 @@ import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 
-public class GuiEditWaystone extends GuiScreen {
-
+public class GuiEditWaystone extends GuiScreen
+{
     private final WaystoneEntry tileWaystone;
     private GuiTextField textField;
     private GuiButton btnDone;
     private GuiCheckBox chkGlobal;
-    private boolean fromSelectionGui;
+    private final boolean fromSelectionGui;
 
-    public GuiEditWaystone(WaystoneEntry waystone, boolean fromSelectionGui) {
+    public GuiEditWaystone(WaystoneEntry waystone, boolean fromSelectionGui)
+    {
         this.tileWaystone = waystone;
         this.fromSelectionGui = fromSelectionGui;
     }
 
     @Override
-    public void initGui() {
+    public void initGui()
+    {
         super.initGui();
-        String oldText = tileWaystone.getName();
-        if (textField != null) {
-            oldText = textField.getText();
+        String oldText = this.tileWaystone.getName();
+        if (this.textField != null) {
+            oldText = this.textField.getText();
         }
 
-        textField = new GuiTextField(2, fontRenderer, width / 2 - 100, height / 2 - 20, 200, 20);
-        textField.setMaxStringLength(128);
-        textField.setText(oldText);
-        textField.setFocused(true);
-        btnDone = new GuiButton(0, width / 2, height / 2 + 10, 100, 20, I18n.format("gui.done"));
-        buttonList.add(btnDone);
+        this.textField = new GuiTextField(2, this.fontRenderer, this.width / 2 - 100, this.height / 2 - 20, 200, 20);
+        this.textField.setMaxStringLength(128);
+        this.textField.setText(oldText);
+        this.textField.setFocused(true);
+        this.btnDone = new GuiButton(0, this.width / 2, this.height / 2 + 10, 100, 20, I18n.format("gui.done"));
+        this.buttonList.add(this.btnDone);
 
-        chkGlobal = new GuiCheckBox(1, width / 2 - 100, height / 2 + 15, " " + I18n.format("gui.waystones:editWaystone.isGlobal"), tileWaystone.isGlobal());
+        this.chkGlobal = new GuiCheckBox(1, this.width / 2 - 100, this.height / 2 + 15, " " + I18n.format("gui.waystones:editWaystone.isGlobal"), this.tileWaystone.isGlobal());
         if (!WaystoneConfig.general.allowEveryoneGlobal && (!Minecraft.getMinecraft().player.capabilities.isCreativeMode)) {
-            chkGlobal.visible = false;
+            this.chkGlobal.visible = false;
         }
 
-        buttonList.add(chkGlobal);
+        this.buttonList.add(this.chkGlobal);
 
         Keyboard.enableRepeatEvents(true);
     }
 
     @Override
-    public void onGuiClosed() {
+    public void onGuiClosed()
+    {
         Keyboard.enableRepeatEvents(false);
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) {
-        if (button == btnDone) {
-            if (textField.getText().isEmpty()) {
-                textField.setFocused(true);
+    protected void actionPerformed(GuiButton button)
+    {
+        if (button == this.btnDone) {
+            if (this.textField.getText().isEmpty()) {
+                this.textField.setFocused(true);
                 return;
             }
 
-            NetworkHandler.channel.sendToServer(new MessageEditWaystone(tileWaystone.getPos(), textField.getText(), chkGlobal.isChecked(), fromSelectionGui));
+            NetworkHandler.channel.sendToServer(new MessageEditWaystone(this.tileWaystone.getPos(), this.textField.getText(), this.chkGlobal.isChecked(), this.fromSelectionGui));
 
-            if (!fromSelectionGui) {
+            if (!this.fromSelectionGui) {
                 FMLClientHandler.instance().getClientPlayerEntity().closeScreen();
             }
 
-            if (tileWaystone.getName().isEmpty()) {
-                MinecraftForge.EVENT_BUS.post(new WaystoneActivatedEvent(textField.getText(), tileWaystone.getPos(), tileWaystone.getDimensionId()));
+            if (this.tileWaystone.getName().isEmpty()) {
+                MinecraftForge.EVENT_BUS.post(new WaystoneActivatedEvent(this.textField.getText(), this.tileWaystone.getPos(), this.tileWaystone.getDimensionId()));
             }
         }
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
-        if (textField.mouseClicked(mouseX, mouseY, mouseButton)) {
-            mouseHandled = true;
+        if (this.textField.mouseClicked(mouseX, mouseY, mouseButton)) {
+            this.mouseHandled = true;
         }
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
         if (keyCode == Keyboard.KEY_RETURN) {
-            actionPerformed(btnDone);
+            this.actionPerformed(this.btnDone);
             return;
         }
 
-        if (textField.textboxKeyTyped(typedChar, keyCode)) {
-            keyHandled = true;
+        if (this.textField.textboxKeyTyped(typedChar, keyCode)) {
+            this.keyHandled = true;
             return;
         }
 
@@ -105,17 +111,18 @@ public class GuiEditWaystone extends GuiScreen {
     }
 
     @Override
-    public void updateScreen() {
-        textField.updateCursorCounter();
+    public void updateScreen()
+    {
+        this.textField.updateCursorCounter();
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawWorldBackground(0);
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    {
+        this.drawWorldBackground(0);
         super.drawScreen(mouseX, mouseY, partialTicks);
 
-        fontRenderer.drawString(I18n.format("gui.waystones:editWaystone.enterName"), width / 2 - 100, height / 2 - 35, 0xFFFFFF);
-        textField.drawTextBox();
+        this.fontRenderer.drawString(I18n.format("gui.waystones:editWaystone.enterName"), this.width / 2 - 100, this.height / 2 - 35, 0xFFFFFF);
+        this.textField.drawTextBox();
     }
-
 }

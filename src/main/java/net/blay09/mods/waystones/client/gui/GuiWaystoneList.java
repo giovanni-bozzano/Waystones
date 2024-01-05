@@ -22,8 +22,8 @@ import org.lwjgl.opengl.GL11;
 import javax.annotation.Nullable;
 import java.io.IOException;
 
-public class GuiWaystoneList extends GuiScreen {
-
+public class GuiWaystoneList extends GuiScreen
+{
     private final WarpMode warpMode;
     private final EnumHand hand;
     private final WaystoneEntry fromWaystone;
@@ -35,7 +35,8 @@ public class GuiWaystoneList extends GuiScreen {
     private boolean isLocationHeaderHovered;
     private int buttonsPerPage;
 
-    public GuiWaystoneList(WaystoneEntry[] entries, WarpMode warpMode, EnumHand hand, @Nullable WaystoneEntry fromWaystone) {
+    public GuiWaystoneList(WaystoneEntry[] entries, WarpMode warpMode, EnumHand hand, @Nullable WaystoneEntry fromWaystone)
+    {
         this.entries = entries;
         this.warpMode = warpMode;
         this.hand = hand;
@@ -43,166 +44,163 @@ public class GuiWaystoneList extends GuiScreen {
     }
 
     @Override
-    public void initGui() {
-        btnPrevPage = new GuiButton(0, width / 2 - 100, height / 2 + 40, 95, 20, I18n.format("gui.waystones:warpStone.previousPage"));
-        buttonList.add(btnPrevPage);
+    public void initGui()
+    {
+        this.btnPrevPage = new GuiButton(0, this.width / 2 - 100, this.height / 2 + 40, 95, 20, I18n.format("gui.waystones:warpStone.previousPage"));
+        this.buttonList.add(this.btnPrevPage);
 
-        btnNextPage = new GuiButton(1, width / 2 + 5, height / 2 + 40, 95, 20, I18n.format("gui.waystones:warpStone.nextPage"));
-        buttonList.add(btnNextPage);
+        this.btnNextPage = new GuiButton(1, this.width / 2 + 5, this.height / 2 + 40, 95, 20, I18n.format("gui.waystones:warpStone.nextPage"));
+        this.buttonList.add(this.btnNextPage);
 
-        updateList();
+        this.updateList();
     }
 
-    public void updateList() {
-        final int maxContentHeight = (int) (height * 0.8f);
+    public void updateList()
+    {
+        final int maxContentHeight = (int) (this.height * 0.8f);
         final int headerHeight = 40;
         final int footerHeight = 25;
         final int entryHeight = 25;
         final int maxButtonsPerPage = (maxContentHeight - headerHeight - footerHeight) / entryHeight;
 
-        buttonsPerPage = Math.max(4, Math.min(maxButtonsPerPage, entries.length));
-        final int contentHeight = headerHeight + buttonsPerPage * entryHeight + footerHeight;
-        headerY = height / 2 - contentHeight / 2;
+        this.buttonsPerPage = Math.max(4, Math.min(maxButtonsPerPage, this.entries.length));
+        final int contentHeight = headerHeight + this.buttonsPerPage * entryHeight + footerHeight;
+        this.headerY = this.height / 2 - contentHeight / 2;
 
-        btnPrevPage.enabled = pageOffset > 0;
-        btnNextPage.enabled = pageOffset < (entries.length - 1) / buttonsPerPage;
+        this.btnPrevPage.enabled = this.pageOffset > 0;
+        this.btnNextPage.enabled = this.pageOffset < (this.entries.length - 1) / this.buttonsPerPage;
 
-        buttonList.removeIf(button -> button instanceof GuiButtonWaystoneEntry || button instanceof GuiButtonSortWaystone || button instanceof GuiButtonRemoveWaystone);
+        this.buttonList.removeIf(button -> button instanceof GuiButtonWaystoneEntry || button instanceof GuiButtonSortWaystone || button instanceof GuiButtonRemoveWaystone);
 
         int id = 2;
         int y = headerHeight;
-        for (int i = 0; i < buttonsPerPage; i++) {
-            int entryIndex = pageOffset * buttonsPerPage + i;
-            if (entryIndex >= 0 && entryIndex < entries.length) {
-                GuiButtonWaystoneEntry btnWaystone = new GuiButtonWaystoneEntry(id, width / 2 - 100, headerY + y, entries[entryIndex], warpMode);
-                if (entries[entryIndex].equals(fromWaystone)) {
+        for (int i = 0; i < this.buttonsPerPage; i++) {
+            int entryIndex = this.pageOffset * this.buttonsPerPage + i;
+            if (entryIndex >= 0 && entryIndex < this.entries.length) {
+                GuiButtonWaystoneEntry btnWaystone = new GuiButtonWaystoneEntry(id, this.width / 2 - 100, this.headerY + y, this.entries[entryIndex], this.warpMode);
+                if (this.entries[entryIndex].equals(this.fromWaystone)) {
                     btnWaystone.enabled = false;
                 }
-                buttonList.add(btnWaystone);
+                this.buttonList.add(btnWaystone);
                 id++;
 
-                GuiButtonSortWaystone sortUp = new GuiButtonSortWaystone(id, width / 2 + 108, headerY + y + 2, btnWaystone, -1);
+                GuiButtonSortWaystone sortUp = new GuiButtonSortWaystone(id, this.width / 2 + 108, this.headerY + y + 2, btnWaystone, -1);
                 if (entryIndex == 0) {
                     sortUp.visible = false;
                 }
-                buttonList.add(sortUp);
+                this.buttonList.add(sortUp);
                 id++;
 
-                GuiButtonSortWaystone sortDown = new GuiButtonSortWaystone(id, width / 2 + 108, headerY + y + 11, btnWaystone, 1);
-                if (entryIndex == entries.length - 1) {
+                GuiButtonSortWaystone sortDown = new GuiButtonSortWaystone(id, this.width / 2 + 108, this.headerY + y + 11, btnWaystone, 1);
+                if (entryIndex == this.entries.length - 1) {
                     sortDown.visible = false;
                 }
-                buttonList.add(sortDown);
-                id++;
-
-                GuiButtonRemoveWaystone remove = new GuiButtonRemoveWaystone(id, width / 2 + 122, headerY + y + 4, btnWaystone);
-                buttonList.add(remove);
+                this.buttonList.add(sortDown);
                 id++;
 
                 y += 22;
             }
         }
 
-        btnPrevPage.y = headerY + headerHeight + buttonsPerPage * 22 + (entries.length > 0 ? 10 : 0);
-        btnNextPage.y = headerY + headerHeight + buttonsPerPage * 22 + (entries.length > 0 ? 10 : 0);
+        this.btnPrevPage.y = this.headerY + headerHeight + this.buttonsPerPage * 22 + (this.entries.length > 0 ? 10 : 0);
+        this.btnNextPage.y = this.headerY + headerHeight + this.buttonsPerPage * 22 + (this.entries.length > 0 ? 10 : 0);
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) {
-        if (button == btnNextPage) {
-            pageOffset = GuiScreen.isShiftKeyDown() ? (entries.length - 1) / buttonsPerPage : pageOffset + 1;
-            updateList();
-        } else if (button == btnPrevPage) {
-            pageOffset = GuiScreen.isShiftKeyDown() ? 0 : pageOffset - 1;
-            updateList();
+    protected void actionPerformed(GuiButton button)
+    {
+        if (button == this.btnNextPage) {
+            this.pageOffset = GuiScreen.isShiftKeyDown() ? (this.entries.length - 1) / this.buttonsPerPage : this.pageOffset + 1;
+            this.updateList();
+        } else if (button == this.btnPrevPage) {
+            this.pageOffset = GuiScreen.isShiftKeyDown() ? 0 : this.pageOffset - 1;
+            this.updateList();
         } else if (button instanceof GuiButtonWaystoneEntry) {
-            NetworkHandler.channel.sendToServer(new MessageTeleportToWaystone(((GuiButtonWaystoneEntry) button).getWaystone(), warpMode, hand, fromWaystone));
-            mc.displayGuiScreen(null);
+            NetworkHandler.channel.sendToServer(new MessageTeleportToWaystone(((GuiButtonWaystoneEntry) button).getWaystone(), this.warpMode, this.hand, this.fromWaystone));
+            this.mc.displayGuiScreen(null);
         } else if (button instanceof GuiButtonSortWaystone) {
             WaystoneEntry waystoneEntry = ((GuiButtonSortWaystone) button).getWaystone();
-            int index = ArrayUtils.indexOf(entries, waystoneEntry);
+            int index = ArrayUtils.indexOf(this.entries, waystoneEntry);
             int sortDir = ((GuiButtonSortWaystone) button).getSortDir();
             int otherIndex = index + sortDir;
             if (GuiScreen.isShiftKeyDown()) {
-                otherIndex = sortDir == -1 ? 0 : entries.length - 1;
+                otherIndex = sortDir == -1 ? 0 : this.entries.length - 1;
             }
-            if (index == -1 || otherIndex < 0 || otherIndex >= entries.length) {
+            if (index == -1 || otherIndex < 0 || otherIndex >= this.entries.length) {
                 return;
             }
 
-            WaystoneEntry swap = entries[index];
-            entries[index] = entries[otherIndex];
-            entries[otherIndex] = swap;
+            WaystoneEntry swap = this.entries[index];
+            this.entries[index] = this.entries[otherIndex];
+            this.entries[otherIndex] = swap;
             NetworkHandler.channel.sendToServer(new MessageSortWaystone(index, otherIndex));
-            updateList();
+            this.updateList();
         } else if (button instanceof GuiButtonRemoveWaystone) {
             WaystoneEntry waystoneEntry = ((GuiButtonRemoveWaystone) button).getWaystone();
-            int index = ArrayUtils.indexOf(entries, waystoneEntry);
-            entries = ArrayUtils.remove(entries, index);
+            int index = ArrayUtils.indexOf(this.entries, waystoneEntry);
+            this.entries = ArrayUtils.remove(this.entries, index);
             NetworkHandler.channel.sendToServer(new MessageRemoveWaystone(index));
-            updateList();
+            this.updateList();
         }
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        if (isLocationHeaderHovered && fromWaystone != null) {
-            Waystones.proxy.openWaystoneSettings(mc.player, fromWaystone, true);
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+        if (this.isLocationHeaderHovered && this.fromWaystone != null) {
+            Waystones.proxy.openWaystoneSettings(this.mc.player, this.fromWaystone, true);
 
-            mouseHandled = true;
+            this.mouseHandled = true;
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawWorldBackground(0);
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    {
+        this.drawWorldBackground(0);
         super.drawScreen(mouseX, mouseY, partialTicks);
         GL11.glColor4f(1f, 1f, 1f, 1f);
-        drawCenteredString(fontRenderer, I18n.format("gui.waystones:warpStone.selectDestination"), width / 2, headerY + (fromWaystone != null ? 20 : 0), 0xFFFFFF);
-        if (fromWaystone != null) {
-            drawLocationHeader(fromWaystone.getName(), mouseX, mouseY, width / 2, headerY);
+        this.drawCenteredString(this.fontRenderer, I18n.format("gui.waystones:warpStone.selectDestination"), this.width / 2, this.headerY + (this.fromWaystone != null ? 20 : 0), 0xFFFFFF);
+        if (this.fromWaystone != null) {
+            this.drawLocationHeader(this.fromWaystone.getName(), mouseX, mouseY, this.width / 2, this.headerY);
         }
 
-        if (entries.length == 0) {
-            drawCenteredString(fontRenderer, TextFormatting.RED + I18n.format("waystones:scrollNotBound"), width / 2, height / 2 - 20, 0xFFFFFF);
+        if (this.entries.length == 0) {
+            this.drawCenteredString(this.fontRenderer, TextFormatting.RED + I18n.format("waystones:scrollNotBound"), this.width / 2, this.height / 2 - 20, 0xFFFFFF);
         }
     }
 
-    public void drawLocationHeader(String locationName, int mouseX, int mouseY, int x, int y) {
+    public void drawLocationHeader(String locationName, int mouseX, int mouseY, int x, int y)
+    {
         String locationPrefix = TextFormatting.YELLOW + I18n.format("gui.waystones:current_location") + " ";
-        int locationPrefixWidth = fontRenderer.getStringWidth(locationPrefix);
+        int locationPrefixWidth = this.fontRenderer.getStringWidth(locationPrefix);
 
-        int locationWidth = fontRenderer.getStringWidth(locationName);
+        int locationWidth = this.fontRenderer.getStringWidth(locationName);
 
         int fullWidth = locationPrefixWidth + locationWidth;
 
         int startX = x - fullWidth / 2 + locationPrefixWidth;
-        if (mouseX >= startX && mouseX < startX + locationWidth + 16
-                && mouseY >= y && mouseY < y + fontRenderer.FONT_HEIGHT) {
-            isLocationHeaderHovered = true;
-        } else {
-            isLocationHeaderHovered = false;
-        }
+        this.isLocationHeaderHovered = mouseX >= startX && mouseX < startX + locationWidth + 16
+                && mouseY >= y && mouseY < y + this.fontRenderer.FONT_HEIGHT;
 
         String fullText = locationPrefix + TextFormatting.WHITE;
-        if (isLocationHeaderHovered) {
+        if (this.isLocationHeaderHovered) {
             fullText += TextFormatting.UNDERLINE;
         }
         fullText += locationName;
 
-        drawString(fontRenderer, TextFormatting.UNDERLINE + fullText, x - fullWidth / 2, y, 0xFFFFFF);
+        this.drawString(this.fontRenderer, TextFormatting.UNDERLINE + fullText, x - fullWidth / 2, y, 0xFFFFFF);
 
-        if (isLocationHeaderHovered) {
+        if (this.isLocationHeaderHovered) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + fullWidth / 2 + 4, y, 0f);
             float scale = 0.5f;
             GlStateManager.scale(scale, scale, scale);
-            mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-            itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.WRITABLE_BOOK), 0, 0);
+            this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.WRITABLE_BOOK), 0, 0);
             GlStateManager.popMatrix();
         }
     }
-
 }

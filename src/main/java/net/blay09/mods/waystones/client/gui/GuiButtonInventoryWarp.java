@@ -12,37 +12,40 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
-public class GuiButtonInventoryWarp extends GuiButton {
+public class GuiButtonInventoryWarp extends GuiButton
+{
+    private final GuiContainer parentScreen;
+    private final ItemStack iconItem;
 
-	private final GuiContainer parentScreen;
-	private final ItemStack iconItem;
+    public GuiButtonInventoryWarp(GuiContainer parentScreen)
+    {
+        super(-1, 0, 0, 16, 16, "");
+        this.parentScreen = parentScreen;
+        this.iconItem = new ItemStack(Waystones.itemReturnScroll);
+    }
 
-	public GuiButtonInventoryWarp(GuiContainer parentScreen) {
-		super(-1, 0, 0, 16, 16, "");
-		this.parentScreen = parentScreen;
-		this.iconItem = new ItemStack(Waystones.itemReturnScroll);
-	}
+    @Override
+    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
+    {
+        if (this.visible) {
+            this.x = this.parentScreen.getGuiLeft() + WaystoneConfig.client.teleportButtonX;
+            this.y = this.parentScreen.getGuiTop() + WaystoneConfig.client.teleportButtonY;
+            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+            mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            EntityPlayer entityPlayer = FMLClientHandler.instance().getClientPlayerEntity();
+            if (!PlayerWaystoneHelper.canFreeWarp(entityPlayer) || PlayerWaystoneHelper.getLastWaystone(entityPlayer) == null) {
+                GlStateManager.color(0.5f, 0.5f, 0.5f, 0.5f);
+            } else if (this.hovered) {
+                GlStateManager.color(1f, 1f, 1f, 1f);
+            } else {
+                GlStateManager.color(0.8f, 0.8f, 0.8f, 0.8f);
+            }
+            Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(this.iconItem, this.x, this.y);
+        }
+    }
 
-	@Override
-	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-		if(visible) {
-			x = parentScreen.guiLeft + WaystoneConfig.client.teleportButtonX;
-			y = parentScreen.guiTop + WaystoneConfig.client.teleportButtonY;
-			hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-			mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-			EntityPlayer entityPlayer = FMLClientHandler.instance().getClientPlayerEntity();
-			if(!PlayerWaystoneHelper.canFreeWarp(entityPlayer) || PlayerWaystoneHelper.getLastWaystone(entityPlayer) == null) {
-				GlStateManager.color(0.5f, 0.5f, 0.5f, 0.5f);
-			} else if(hovered) {
-				GlStateManager.color(1f, 1f, 1f, 1f);
-			} else {
-				GlStateManager.color(0.8f, 0.8f, 0.8f, 0.8f);
-			}
-			Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(iconItem, x, y);
-		}
-	}
-
-	public boolean isHovered() {
-		return hovered;
-	}
+    public boolean isHovered()
+    {
+        return this.hovered;
+    }
 }

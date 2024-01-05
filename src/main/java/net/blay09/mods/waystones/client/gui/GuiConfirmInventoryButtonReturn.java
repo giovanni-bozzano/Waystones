@@ -2,8 +2,8 @@ package net.blay09.mods.waystones.client.gui;
 
 import net.blay09.mods.waystones.PlayerWaystoneHelper;
 import net.blay09.mods.waystones.network.NetworkHandler;
-import net.blay09.mods.waystones.network.message.MessageTeleportToGlobal;
 import net.blay09.mods.waystones.network.message.MessageFreeWarpReturn;
+import net.blay09.mods.waystones.network.message.MessageTeleportToGlobal;
 import net.blay09.mods.waystones.util.WaystoneEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiYesNo;
@@ -12,15 +12,17 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
-public class GuiConfirmInventoryButtonReturn extends GuiYesNo implements GuiYesNoCallback {
-
+public class GuiConfirmInventoryButtonReturn extends GuiYesNo implements GuiYesNoCallback
+{
     private final String waystoneName;
 
-    public GuiConfirmInventoryButtonReturn() {
+    public GuiConfirmInventoryButtonReturn()
+    {
         this("");
     }
 
-    public GuiConfirmInventoryButtonReturn(String targetWaystone) {
+    public GuiConfirmInventoryButtonReturn(String targetWaystone)
+    {
         super((result, id) -> {
             if (result) {
                 if (targetWaystone.isEmpty()) {
@@ -35,7 +37,8 @@ public class GuiConfirmInventoryButtonReturn extends GuiYesNo implements GuiYesN
         this.waystoneName = getWaystoneName(targetWaystone);
     }
 
-    private static String getWaystoneName(String targetWaystone) {
+    private static String getWaystoneName(String targetWaystone)
+    {
         if (!targetWaystone.isEmpty()) {
             return TextFormatting.GRAY + I18n.format("gui.waystones:confirmReturn.boundTo", targetWaystone);
         }
@@ -49,8 +52,9 @@ public class GuiConfirmInventoryButtonReturn extends GuiYesNo implements GuiYesN
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    {
         super.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(fontRenderer, waystoneName, width / 2, 100, 0xFFFFFF);
+        this.drawCenteredString(this.fontRenderer, this.waystoneName, this.width / 2, 100, 0xFFFFFF);
     }
 }

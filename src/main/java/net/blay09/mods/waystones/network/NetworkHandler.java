@@ -12,29 +12,32 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class NetworkHandler {
+public class NetworkHandler
+{
+    public static final SimpleNetworkWrapper channel = NetworkRegistry.INSTANCE.newSimpleChannel(Waystones.MOD_ID);
 
-	public static final SimpleNetworkWrapper channel = NetworkRegistry.INSTANCE.newSimpleChannel(Waystones.MOD_ID);
+    public static void init()
+    {
+        channel.registerMessage(HandlerConfig.class, MessageConfig.class, 0, Side.CLIENT);
+        channel.registerMessage(HandlerWaystones.class, MessageWaystones.class, 1, Side.CLIENT);
+        channel.registerMessage(HandlerFreeWarpReturn.class, MessageFreeWarpReturn.class, 2, Side.SERVER);
+        channel.registerMessage(HandlerEditWaystone.class, MessageEditWaystone.class, 3, Side.SERVER);
+        channel.registerMessage(HandlerTeleportToWaystone.class, MessageTeleportToWaystone.class, 4, Side.SERVER);
+        channel.registerMessage(HandlerTeleportEffect.class, MessageTeleportEffect.class, 5, Side.CLIENT);
+        channel.registerMessage(HandlerSortWaystone.class, MessageSortWaystone.class, 6, Side.SERVER);
+        channel.registerMessage(HandlerRemoveWaystone.class, MessageRemoveWaystone.class, 7, Side.SERVER);
+        channel.registerMessage(HandlerTeleportToGlobal.class, MessageTeleportToGlobal.class, 8, Side.SERVER);
+        channel.registerMessage(HandlerOpenWaystoneSelection.class, MessageOpenWaystoneSelection.class, 9, Side.CLIENT);
+    }
 
-	public static void init() {
-		channel.registerMessage(HandlerConfig.class, MessageConfig.class, 0, Side.CLIENT);
-		channel.registerMessage(HandlerWaystones.class, MessageWaystones.class, 1, Side.CLIENT);
-		channel.registerMessage(HandlerFreeWarpReturn.class, MessageFreeWarpReturn.class, 2, Side.SERVER);
-		channel.registerMessage(HandlerEditWaystone.class, MessageEditWaystone.class, 3, Side.SERVER);
-		channel.registerMessage(HandlerTeleportToWaystone.class, MessageTeleportToWaystone.class, 4, Side.SERVER);
-		channel.registerMessage(HandlerTeleportEffect.class, MessageTeleportEffect.class, 5, Side.CLIENT);
-		channel.registerMessage(HandlerSortWaystone.class, MessageSortWaystone.class, 6, Side.SERVER);
-		channel.registerMessage(HandlerRemoveWaystone.class, MessageRemoveWaystone.class, 7, Side.SERVER);
-		channel.registerMessage(HandlerTeleportToGlobal.class, MessageTeleportToGlobal.class, 8, Side.SERVER);
-		channel.registerMessage(HandlerOpenWaystoneSelection.class, MessageOpenWaystoneSelection.class, 9, Side.CLIENT);
-	}
+    public static IThreadListener getThreadListener(MessageContext ctx)
+    {
+        return ctx.side == Side.SERVER ? (WorldServer) ctx.getServerHandler().player.world : getClientThreadListener();
+    }
 
-	public static IThreadListener getThreadListener(MessageContext ctx) {
-		return ctx.side == Side.SERVER ? (WorldServer) ctx.getServerHandler().player.world : getClientThreadListener();
-	}
-
-	@SideOnly(Side.CLIENT)
-	public static IThreadListener getClientThreadListener() {
-		return Minecraft.getMinecraft();
-	}
+    @SideOnly(Side.CLIENT)
+    public static IThreadListener getClientThreadListener()
+    {
+        return Minecraft.getMinecraft();
+    }
 }

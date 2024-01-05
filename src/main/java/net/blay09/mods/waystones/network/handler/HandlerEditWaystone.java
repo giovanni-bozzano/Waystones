@@ -23,10 +23,12 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
 
-public class HandlerEditWaystone implements IMessageHandler<MessageEditWaystone, IMessage> {
+public class HandlerEditWaystone implements IMessageHandler<MessageEditWaystone, IMessage>
+{
     @Override
     @Nullable
-    public IMessage onMessage(final MessageEditWaystone message, final MessageContext ctx) {
+    public IMessage onMessage(final MessageEditWaystone message, final MessageContext ctx)
+    {
         NetworkHandler.getThreadListener(ctx).addScheduledTask(() -> {
             EntityPlayerMP entityPlayer = ctx.getServerHandler().player;
             if (WaystoneConfig.general.creativeModeOnly && !entityPlayer.capabilities.isCreativeMode) {
@@ -39,7 +41,7 @@ public class HandlerEditWaystone implements IMessageHandler<MessageEditWaystone,
                 return;
             }
 
-            GlobalWaystones globalWaystones = GlobalWaystones.get(entityPlayer.world);
+            GlobalWaystones globalWaystones = GlobalWaystones.get();
             TileEntity tileEntity = world.getTileEntity(pos);
             if (tileEntity instanceof TileWaystone) {
                 TileWaystone tileWaystone = ((TileWaystone) tileEntity).getParent();
@@ -90,7 +92,6 @@ public class HandlerEditWaystone implements IMessageHandler<MessageEditWaystone,
                     NetworkHandler.channel.sendTo(new MessageOpenWaystoneSelection(WarpMode.WAYSTONE, EnumHand.MAIN_HAND, newWaystone), entityPlayer);
                 }
             }
-
         });
         return null;
     }

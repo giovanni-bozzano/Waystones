@@ -13,10 +13,12 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
 
-public class HandlerFreeWarpReturn implements IMessageHandler<MessageFreeWarpReturn, IMessage> {
+public class HandlerFreeWarpReturn implements IMessageHandler<MessageFreeWarpReturn, IMessage>
+{
     @Override
     @Nullable
-    public IMessage onMessage(MessageFreeWarpReturn message, final MessageContext ctx) {
+    public IMessage onMessage(MessageFreeWarpReturn message, final MessageContext ctx)
+    {
         NetworkHandler.getThreadListener(ctx).addScheduledTask(() -> {
             if (!WaystoneConfig.general.teleportButton) {
                 return;
@@ -35,7 +37,6 @@ public class HandlerFreeWarpReturn implements IMessageHandler<MessageFreeWarpRet
             }
 
             WaystoneManager.sendPlayerWaystones(entityPlayer);
-
         });
         return null;
     }

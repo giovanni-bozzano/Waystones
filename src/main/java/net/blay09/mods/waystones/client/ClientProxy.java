@@ -22,6 +22,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,36 +30,40 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.server.FMLServerHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 
-public class ClientProxy extends CommonProxy {
-
+public class ClientProxy extends CommonProxy
+{
     private GuiButtonInventoryWarp buttonWarp;
     private boolean isVivecraftInstalled;
 
     @Override
-    public void preInit(FMLPreInitializationEvent event) {
+    public void preInit(FMLPreInitializationEvent event)
+    {
         super.preInit(event);
         MinecraftForge.EVENT_BUS.register(this);
 
         ClientRegistry.bindTileEntitySpecialRenderer(TileWaystone.class, new RenderWaystone());
 
-        isVivecraftInstalled = ClientBrandRetriever.getClientModName().toLowerCase(Locale.ENGLISH).contains("vivecraft");
+        this.isVivecraftInstalled = ClientBrandRetriever.getClientModName().toLowerCase(Locale.ENGLISH).contains("vivecraft");
     }
 
     @SubscribeEvent
-    public void onInitGui(GuiScreenEvent.InitGuiEvent.Post event) {
+    public void onInitGui(GuiScreenEvent.InitGuiEvent.Post event)
+    {
         if (WaystoneConfig.general.teleportButton && event.getGui() instanceof GuiInventory) {
-            buttonWarp = new GuiButtonInventoryWarp((GuiContainer) event.getGui());
-            event.getButtonList().add(buttonWarp);
+            this.buttonWarp = new GuiButtonInventoryWarp((GuiContainer) event.getGui());
+            event.getButtonList().add(this.buttonWarp);
         }
     }
 
     @SubscribeEvent
-    public void onActionPerformed(GuiScreenEvent.ActionPerformedEvent.Pre event) {
+    public void onActionPerformed(GuiScreenEvent.ActionPerformedEvent.Pre event)
+    {
         if (event.getButton() instanceof GuiButtonInventoryWarp) {
             EntityPlayer entityPlayer = FMLClientHandler.instance().getClientPlayerEntity();
             if (PlayerWaystoneHelper.canFreeWarp(entityPlayer)) {
@@ -81,8 +86,9 @@ public class ClientProxy extends CommonProxy {
     private static final List<String> tmpTooltip = Lists.newArrayList();
 
     @SubscribeEvent
-    public void onDrawScreen(GuiScreenEvent.DrawScreenEvent.Post event) {
-        if (event.getGui() instanceof GuiInventory && buttonWarp != null && buttonWarp.isHovered()) {
+    public void onDrawScreen(GuiScreenEvent.DrawScreenEvent.Post event)
+    {
+        if (event.getGui() instanceof GuiInventory && this.buttonWarp != null && this.buttonWarp.isHovered()) {
             tmpTooltip.clear();
             long timeSince = System.currentTimeMillis() - PlayerWaystoneHelper.getLastFreeWarp(FMLClientHandler.instance().getClientPlayerEntity());
             int secondsLeft = (int) ((WaystoneConfig.general.teleportButtonCooldown * 1000 - timeSince) / 1000);
@@ -114,14 +120,16 @@ public class ClientProxy extends CommonProxy {
     }
 
     @SubscribeEvent
-    public void onFOV(FOVUpdateEvent event) {
+    public void onFOV(FOVUpdateEvent event)
+    {
         if (!event.getEntity().getActiveItemStack().isEmpty() && event.getEntity().getActiveItemStack().getItem() == Waystones.itemReturnScroll) {
             event.setNewfov(event.getEntity().getItemInUseCount() / 64f * 2f + 0.5f);
         }
     }
 
     @Override
-    public void openWaystoneSelection(EntityPlayer player, WarpMode mode, EnumHand hand, @Nullable WaystoneEntry fromWaystone) {
+    public void openWaystoneSelection(EntityPlayer player, WarpMode mode, EnumHand hand, @Nullable WaystoneEntry fromWaystone)
+    {
         if (player == Minecraft.getMinecraft().player) {
             WaystoneEntry[] waystones = PlayerWaystoneData.fromPlayer(FMLClientHandler.instance().getClientPlayerEntity()).getWaystones();
             Minecraft.getMinecraft().displayGuiScreen(new GuiWaystoneList(waystones, mode, hand, fromWaystone));
@@ -129,19 +137,28 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public void openWaystoneSettings(EntityPlayer player, WaystoneEntry waystone, boolean fromSelectionGui) {
+    public void openWaystoneSettings(EntityPlayer player, WaystoneEntry waystone, boolean fromSelectionGui)
+    {
         if (player == Minecraft.getMinecraft().player) {
             Minecraft.getMinecraft().displayGuiScreen(new GuiEditWaystone(waystone, fromSelectionGui));
         }
     }
 
     @Override
-    public void playSound(SoundEvent sound, BlockPos pos, float pitch) {
+    public void playSound(SoundEvent sound, BlockPos pos, float pitch)
+    {
         Minecraft.getMinecraft().getSoundHandler().playSound(new PositionedSoundRecord(sound, SoundCategory.AMBIENT, WaystoneConfig.client.soundVolume, pitch, pos));
     }
 
     @Override
-    public boolean isVivecraftInstalled() {
-        return isVivecraftInstalled;
+    public World getDefaultWorld()
+    {
+        return Minecraft.getMinecraft().world;
+    }
+
+    @Override
+    public boolean isVivecraftInstalled()
+    {
+        return this.isVivecraftInstalled;
     }
 }
